@@ -244,11 +244,11 @@ void Optimizer::internal_init()
 
   if (mpi->io_node()) {
     if (this->early_stop) {
-      cout << "Iteration    \u0190_train = \u03A3(E\u00b2)    \u0190_val = \u03A3(E\u00b2)       |\u2207\u0190|"<<endl;
-      cout << "-------------------------------------------------------------" << endl;
+      cout << "Iteration    \u0190_train = \u03A3(E\u00b2)    \u0190_val = \u03A3(E\u00b2)       |\u2207\u0190|     Finished on"<<endl;
+      cout << "------------------------------------------------------------------------------------------" << endl;
     } else {
-      cout << "Iteration    \u0190 = \u03A3(E\u00b2)       |\u2207\u0190|"<<endl;
-      cout << "-------------------------------------" << endl;
+      cout << "Iteration    \u0190 = \u03A3(E\u00b2)       |\u2207\u0190|     Finished on"<<endl;
+      cout << "-------------------------------------------------------------------" << endl;
     }
   }
 
@@ -977,17 +977,23 @@ void Optimizer::update_network(REAL Error, vector<REAL> grad, REAL SSE)
         if ( !(iteration_counter % F_params.Nprint()) || my_is_converged) {
           if (! this->early_stop) {
 #ifdef USE_LONG_DOUBLE
-            printf("%-9d %#13.6Le %#13.6Le\n",iteration_counter++,sqrt(SSE),norm);
+            printf("%-9d %#13.6Le %#13.6Le",iteration_counter++,sqrt(SSE),norm);
 #else
-            printf("%-9d %#13.6e %#13.6e\n",iteration_counter++,sqrt(SSE),norm);
+            printf("%-9d %#13.6e %#13.6e",iteration_counter++,sqrt(SSE),norm);
 #endif
           } else {
 #ifdef USE_LONG_DOUBLE
-            printf("%-9d %#13.6Le %#13.6Le %#13.6Le\n",iteration_counter++,sqrt(SSE),sse_val,norm);
+            printf("%-9d %#13.6Le %#13.6Le %#13.6Le",iteration_counter++,sqrt(SSE),sse_val,norm);
 #else
-            printf("%-12d %#13.6e    %#13.6e    %#13.6e\n",iteration_counter++,sqrt(SSE),sse_val,norm);
+            printf("%-12d %#13.6e    %#13.6e    %#13.6e",iteration_counter++,sqrt(SSE),sse_val,norm);
 #endif
           }
+          time_t rawtime;
+          time (&rawtime);
+          stringstream stime;
+          stime << asctime(localtime(&rawtime));
+          string s = stime.str();
+          cout <<"     "<<s.substr(0, s.length() - 1)<<endl; // This trick is for flushing. printf seems to have problem with flushing (NERSC-CORI). cout does not format.
         } else {
           iteration_counter++;
         }
